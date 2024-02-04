@@ -1,0 +1,20 @@
+# which process is taking most cpu?
+ps aux --sort -%cpu | head -2
+
+# which process is taking most memory?
+ps aux --sort -%mem | head -2
+
+# which process is using port 8080?
+netstat -ltnp | grep -w ':8080'
+
+# how to create a python venv foo?
+python -m venv /path/to/foo
+
+# what's changed in the last helm release foobar?
+ll=$(helm history foobar -o json | jq '.[-2] | .revision') && helm diff revision foobar $ll
+
+# what's the difference between helm release foo vs bar?
+diff --color <(helm history foo -o json | jq '.[-1] | {chart,app_version}') <(helm history bar -o json | jq '.[-1] | {chart,app_version}')
+
+# what will happen if we deploy a new helm chart foobar from directory xyz?
+helm diff upgrade foobar xyz --allow-unreleased
