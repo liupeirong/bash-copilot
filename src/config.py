@@ -8,7 +8,6 @@ class PromptConfig:
     deployment=''
     temperature=0
     max_tokens=300
-    context_file=''
 
     def __init__(self):
         config = configparser.ConfigParser()

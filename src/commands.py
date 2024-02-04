@@ -16,9 +16,12 @@ def get_command_result(input: str, context: PromptFile):
     if input.__contains__("context"):
         # show context <n>
         if input.__contains__("show"):
-            print(f"display: {context.current_context_file}")
+            print(f"-------------display: {context.current_context_file}:")
             os.system(f"cat {context.current_context_file}")
             print('\n')
+            print(f"-------------display: messages in memory:")
+            for msg in context.meta_messages + context.user_messages:
+                print(f"{msg['role']}: {msg['content']}")
             return "context shown"
         
         # clear last context
@@ -28,7 +31,7 @@ def get_command_result(input: str, context: PromptFile):
         
         # clear context
         if input.__contains__("clear"):
-            context.init_context()
+            context.clear_context()
             return "cleared context"
         
     return ""
