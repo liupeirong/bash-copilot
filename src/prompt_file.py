@@ -76,9 +76,12 @@ class PromptFile:
         self.init_meta_context()
         self.init_user_context()
 
-    def append_input_to_context(self, input) -> list:
-        msg = {"role": "user", "content": input}
-        input_tokens_count = count_tokens_approx([msg])
+    def get_all_messages(self) -> list:
+        return self.meta_messages + self.user_messages
+
+    def append_interaction_to_context(self, input, output):
+        in_msg = {"role": "user", "content": input}
+        input_tokens_count = count_tokens_approx([in_msg])
         if self.token_count + input_tokens_count > self.config.max_tokens:
             # delete first 2 lines of prompt context file
             self.token_count -= count_tokens_approx(self.user_messages[:2])
@@ -88,17 +91,15 @@ class PromptFile:
                     f.write(f'{m["content"]}\n')
 
         self.token_count += input_tokens_count
-        self.user_messages.append(msg)
+        self.user_messages.append(in_msg)
         with open(self.current_context_file, "a") as f:
-            f.write(f'{msg["content"]}\n')
-        return self.meta_messages + self.user_messages
+            f.write(f'{in_msg["content"]}\n')
 
-    def append_output_to_context(self, llm_output):
-        msg = {"role": "assistant", "content": llm_output}
-        self.user_messages.append(msg)
-        self.token_count += count_tokens_approx([msg])
+        out_msg = {"role": "assistant", "content": output}
+        self.user_messages.append(out_msg)
+        self.token_count += count_tokens_approx([out_msg])
         with open(self.current_context_file, "a") as f:
-            f.write(f'{msg["content"]}\n')
+            f.write(f'{out_msg["content"]}\n')
 
     def clear_last_interaction(self):
         if len(self.user_messages) == 0:
