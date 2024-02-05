@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/bash
 
 set -e
 trap 'exitScript' ERR
@@ -17,24 +17,6 @@ To uninstall Bash Copilot use bash_cleanup.sh.
 _EOF_
 }
 
-# Call OpenAI API with the given settings to verify everything is in order
-validateSettings()
-{
-    echo -n "*** Testing Open AI access... "
-    local TEST=$(curl -s "$OPENAI_API_URL/openai/deployments" -H "api-key: $OPENAI_API_KEY" -H "Content-Type: application/json" -w '%{http_code}')
-    local STATUS_CODE=$(echo "$TEST"|tail -n 1)
-    if [ $STATUS_CODE -ne 200 ]; then
-        echo "ERROR [$STATUS_CODE]"
-        echo "Failed to access OpenAI API, result: $STATUS_CODE"
-        echo "Please check your env variables OPENAI_API_URL and OPENAI_API_KEY" 
-        echo "*************"
-        exitScript
-        return
-    fi
-    echo "OK ***"
-}
-
-# Store API key and other settings in `openaiapirc`
 configureApp()
 { 
     chmod +x "$BASH_COPILOT_PATH/src/main.py"
@@ -44,11 +26,10 @@ configureApp()
 configureBash()
 {
     echo "*** Configuring bash [$BASH_COPILOT_PATH] ***"
-    echo -n > $BASH_COPILOT_PATH
+    echo -n > $BASH_COPILOT_RC_FILE
     echo "export BASH_COPILOT_PATH=\"${BASH_COPILOT_PATH}\"" >> $BASH_COPILOT_RC_FILE
     echo 'source "${BASH_COPILOT_PATH}/scripts/bash_plugin.sh"' >> $BASH_COPILOT_RC_FILE
     echo "bind -x '\"\C-g\":\"create_completion\"'" >> $BASH_COPILOT_RC_FILE
-    echo 'source "$BASH_COPILOT_PATH/venv/bin/activate"' >> $BASH_COPILOT_RC_FILE
     echo "SOURCED: $SOURCED"
     if [ $SOURCED -eq 1 ]; then
         echo "*** Testing bash settings [$BASH_COPILOT_RC_FILE] ***"
@@ -109,11 +90,9 @@ exitScript()
 # Detect if the script is sourced
 (return 0 2>/dev/null) && SOURCED=1 || SOURCED=0
 
-BASH_COPILOT_PATH="$HOME/dev/bash-copilot"
+BASH_COPILOT_PATH="$HOME/clouddrive/bash_copilot"
 BASH_COPILOT_RC_FILE="$HOME/.bashcopilotrc"
 
-Start installation
-validateSettings
 configureApp
 configureBash
 enableApp

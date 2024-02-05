@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 
 from openai import AzureOpenAI
@@ -26,7 +26,7 @@ if __name__ == "__main__":
         if (
             command_result != ""
         ):  # executed the command of this app not bash, must restart shell
-            print("\nCommand completed, exit shell.")
+            print(f"\n# {command_result}, exit shell.")
             sys.exit(0)
 
         in_msg = {"role": "user", "content": user_input}
@@ -36,7 +36,7 @@ if __name__ == "__main__":
             model=config.deployment, messages=all_messages, temperature=config.temperature, top_p=1, max_tokens=config.max_tokens, stop="#")
         if response.choices[0].finish_reason == "stop":
             completion_all = response.choices[0].message.content
-            print(completion_all)
+            print(f"\n{completion_all}")
             prompt_file.append_interaction_to_context(user_input, completion_all)
 
     except Exception as e:

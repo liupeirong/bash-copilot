@@ -14,14 +14,19 @@ def get_command_result(input: str, context: PromptFile):
     """
     # context file commands
     if input.__contains__("context"):
-        # show context <n>
+        # show context
         if input.__contains__("show"):
-            print(f"-------------display: {context.current_context_file}:")
-            os.system(f"cat {context.current_context_file}")
-            print('\n')
-            print(f"-------------display: messages in memory:")
+            print("\n")
+            print(f"#-------------display: {context.current_context_file}:")
+            if os.path.exists(context.current_context_file):
+                with open(context.current_context_file, "r") as f:
+                    lines = f.readlines()
+                    for line in lines:
+                        print(f"#{line.rstrip()}")
+            print(f"#-------------display: messages in memory:")
             for msg in context.meta_messages + context.user_messages:
-                print(f"{msg['role']}: {msg['content']}")
+                print(f"#{msg['role']}: {msg['content']}")
+            print("\n")
             return "context shown"
         
         # clear last context
