@@ -18,3 +18,6 @@ diff --color <(helm history foo -o json | jq '.[-1] | {chart,app_version}') <(he
 
 # what will happen if we deploy a new helm chart foobar from directory xyz?
 helm diff upgrade foobar xyz --allow-unreleased
+
+# what's the weather like in Seattle?
+curl wttr.in/seattle
